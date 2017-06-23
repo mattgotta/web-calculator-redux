@@ -17,3 +17,15 @@ export function handleClick(e) {
     payload: e.target.id
   }
 }
+export function handleOperator(type, payload) {
+  return {
+    type: type,
+    payload: payload
+  }
+}
+export function setOperatorDisplay(payload) {
+  return {
+    type: 'OPERATOR_DISPLAY',
+    payload: payload
+  }
+}
