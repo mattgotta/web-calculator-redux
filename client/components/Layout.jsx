@@ -15,6 +15,8 @@ import {setOperatorDisplay, handleOperator, buttonPress, handleClick, handleUser
     subtraction: store.operator.subtraction,
     addition: store.operator.addition,
     operatorDisplay: store.operator.operatorDisplay,
+    secondInput: store.operator.secondInput,
+    equalsChain: store.operator.equalsChain,
   }
 })
 
@@ -28,24 +30,6 @@ export default class Layout extends React.Component {
   }
   handleClick(e) {
     this.props.dispatch(handleClick(e))
-  }
-  displayOperator() {
-    switch(true) {
-      case (this.props.multiplication): {
-        return this.props.firstInput + "X"
-      }
-      case (this.props.division): {
-        return this.props.firstInput + "/"
-      }
-      case (this.props.subtraction): {
-        return this.props.firstInput + "-"
-      }
-      case (this.props.addition): {
-        return this.props.firstInput + "+"
-        console.log(this.props.firstInput)
-      }
-      return this.props.firstInput
-    }
   }
   returnEquals() {
     if (this.props.addition == true){
@@ -76,10 +60,17 @@ export default class Layout extends React.Component {
   handleOperator(e) {
     if (this.props.multiplication || this.props.division ||
     this.props.addition || this.props.subtraction) {
-      var a = this.returnEquals();
-      var type = e.target.id + 'CHAIN'
-      this.props.dispatch(handleOperator(type, a))
-      this.props.dispatch(setOperatorDisplay(type))
+      if (this.props.equalsChain) {
+        var type = e.target.id
+        this.props.dispatch(handleOperator(type))
+        this.props.dispatch(setOperatorDisplay(type))
+      }
+      else {
+        var a = this.returnEquals();
+        var type = e.target.id + 'CHAIN'
+        this.props.dispatch(handleOperator(type, a))
+        this.props.dispatch(setOperatorDisplay(e.target.id))
+      }
     }
     else {
       var type = e.target.id
@@ -87,11 +78,13 @@ export default class Layout extends React.Component {
       this.props.dispatch(setOperatorDisplay(type))
     }
   }
+
+
   render() {
     return (
      <div style={{textAlign: 'center'}} className="calc">
         <h3 className="title">Crapulator</h3>
-        <h2 className="back">{this.props.firstInput + this.props.operatorDisplay}</h2>
+        <h2 className="back">{this.props.firstInput + " " + this.props.operatorDisplay + " " + this.props.secondInput}</h2>
         <input
          value={this.props.userInput}
          type="text"

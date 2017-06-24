@@ -2,11 +2,13 @@
 const initialState = {
       userInput: "0",
       firstInput: "",
+      secondInput: "",
       addition: false,
       subtraction: false,
       division: false,
       multiplication: false,
       operatorDisplay: "",
+      equalsChain: false,
     }
 
     function setFalse() {
@@ -15,13 +17,14 @@ const initialState = {
         subtraction: false,
         division: false,
         multiplication: false,
+        equalsChain: false,
       }
     }
     function clearAllInput() {
-      return {userInput: '0', firstInput: '', operatorDisplay: ""}
+      return {userInput: '0', firstInput: '', secondInput: '', operatorDisplay: ""}
     }
     function switchInputs(state) {
-      return { firstInput: state.userInput, userInput: '0',}
+      return { firstInput: state.userInput, userInput: '0', secondInput: ""}
     }
 
     export default function reducer (state=initialState, action) {
@@ -35,7 +38,7 @@ const initialState = {
       case 'CLEAR': {
           let falseOperator = setFalse()
           let clearInput = clearAllInput()
-          return {...falseOperator, ...clearInput}
+          return {...state, ...falseOperator, ...clearInput}
       }
       case 'CLICK': { //receives payload of numb value
         if (action.payload != "." && state.userInput == "0") {
@@ -69,30 +72,57 @@ const initialState = {
         };
       }
       case 'EQUALS': {
-        let falseOperator = setFalse()
-        if (state.addition == true){
-          let first = parseFloat(state.firstInput);
-          let second = parseFloat(state.userInput);
-          var secretOutput = first + second;
-          return {...state, userInput: String(secretOutput)}
+        if (!state.equalsChain) {
+          if (state.addition == true){
+            let first = parseFloat(state.firstInput);
+            let second = parseFloat(state.userInput);
+            var secretOutput = first + second;
+            return {...state, equalsChain: true, secondInput: second, userInput: String(secretOutput)}
+          }
+          else if (state.subtraction == true) {
+            let first = parseFloat(state.firstInput);
+            let second = parseFloat(state.userInput);
+            var secretOutput = first - second;
+            return {...state, equalsChain: true, secondInput: second,  userInput: String(secretOutput)};
+          }
+          else if (state.division == true) {
+            let first = parseFloat(state.firstInput);
+            let second = parseFloat(state.userInput);
+            var secretOutput = first / second;
+            return {...state, equalsChain: true, secondInput: second, userInput: String(secretOutput)};
+          }
+          else if (state.multiplication == true) {
+            let first = parseFloat(state.firstInput);
+            let second = parseFloat(state.userInput);
+            var secretOutput = first * second;
+            return {...state, equalsChain: true, secondInput: second,  userInput: String(secretOutput)};
+          }
         }
-        else if (state.subtraction == true) {
-          let first = parseFloat(state.firstInput);
-          let second = parseFloat(state.userInput);
-          var secretOutput = first - second;
-          return {...state,  userInput: String(secretOutput)};
-        }
-        else if (state.division == true) {
-          let first = parseFloat(firstInput);
-          let second = parseFloat(state.userInput);
-          var secretOutput = first / second;
-          return {...state, userInput: String(secretOutput)};
-        }
-        else if (state.multiplication == true) {
-          let first = parseFloat(state.firstInput);
-          let second = parseFloat(state.userInput);
-          var secretOutput = first * second;
-          return {...state,  userInput: String(secretOutput)};
+        if (state.equalsChain) {
+          if (state.addition == true){
+            let first = parseFloat(state.userInput);
+            let second = parseFloat(state.secondInput);
+            var secretOutput = first + second;
+            return {...state, equalsChain: true, firstInput: first, secondInput: second, userInput: String(secretOutput)}
+          }
+          else if (state.subtraction == true) {
+            let first = parseFloat(state.userInput);
+            let second = parseFloat(state.secondInput);
+            var secretOutput = first - second;
+            return {...state, equalsChain: true, firstInput: first, secondInput: second,  userInput: String(secretOutput)};
+          }
+          else if (state.division == true) {
+            let first = parseFloat(state.userInput);
+            let second = parseFloat(state.secondInput);
+            var secretOutput = first / second;
+            return {...state, equalsChain: true, firstInput: first, secondInput: second, userInput: String(secretOutput)};
+          }
+          else if (state.multiplication == true) {
+            let first = parseFloat(state.userInput);
+            let second = parseFloat(state.secondInput);
+            var secretOutput = first * second;
+            return {...state, equalsChain: true, firstInput: first, secondInput: second,  userInput: String(secretOutput)};
+          }
         }
         else {return {...state}}
       }
@@ -125,7 +155,8 @@ const initialState = {
         return {...state, ...switchedInputs, ...falseOperator, addition: true}
       }
       case 'ADDCHAIN': {
-        return {...state, firstInput: action.payload, userInput: '0', addition: true}
+        let falseOperator = setFalse()
+        return {...state, ...falseOperator,  firstInput: action.payload, userInput: '0', addition: true}
       }
       case 'MINUS': {
         let switchedInputs = switchInputs(state)
@@ -133,7 +164,8 @@ const initialState = {
         return {...state, ...switchedInputs, ...falseOperator, subtraction: true}
       }
       case 'MINUSCHAIN': {
-        return {...state, firstInput: action.payload, userInput: '0', subtraction: true}
+        let falseOperator = setFalse()
+        return {...state,  ...falseOperator, firstInput: action.payload, userInput: '0', subtraction: true}
       }
       case 'MULTIPLY': {
         let switchedInputs = switchInputs(state)
@@ -141,7 +173,8 @@ const initialState = {
         return {...state, ...switchedInputs, ...falseOperator, multiplication: true}
       }
       case 'MULTIPLYCHAIN': {
-        return {...state, firstInput: action.payload, userInput: '0', multiplication: true}
+        let falseOperator = setFalse()
+        return {...state, ...falseOperator,  firstInput: action.payload, userInput: '0', multiplication: true}
       }
       case 'DIVIDE': {
         let switchedInputs = switchInputs(state)
@@ -149,13 +182,22 @@ const initialState = {
         return {...state, ...switchedInputs, ...falseOperator, division: true}
       }
       case 'DIVIDECHAIN': {
-        return {...state, firstInput: action.payload, userInput: '0', division: true}
+        let falseOperator = setFalse()
+        return {...state,  ...falseOperator, firstInput: action.payload, userInput: '0', division: true}
       }
       case 'OPERATOR_DISPLAY': {
         if (action.payload == 'ADD') {
           return {...state, operatorDisplay: "+"}
         }
-
+        if (action.payload == 'MINUS') {
+          return {...state, operatorDisplay: "-"}
+        }
+        if (action.payload == 'DIVIDE') {
+          return {...state, operatorDisplay: "/"}
+        }
+        if (action.payload == 'MULTIPLY') {
+          return {...state, operatorDisplay: "x"}
+        }
       }
     }
     return state;
